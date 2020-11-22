@@ -1,0 +1,18 @@
+##code link https://code.earthengine.google.com/37d0231e2f5b76af0b9fc1d696b02a5c
+
+var col = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY"),
+    trmm = ee.ImageCollection("TRMM/3B42");
+		
+var states= ee.FeatureCollection('ft:1jgxXCfcaX3aozNhOFxhXviHje7MTqwDCM3eZU9Ec');
+var Odisha = states.filterMetadata('StateName', 'equals', 'Odisha');
+Map.addLayer(Odisha,{},'Odisha Boundary')
+var odc=ee.Image(col.filterDate('2018-01-01', '2018-01-02'));
+print(odc)
+var img=ee.Image('UCSB-CHG/CHIRPS/DAILY/20180101').clip(Odisha)
+Map.addLayer(img,{},'Precipitation')
+// odc=odc.clip(Odisha)
+// Map.addLayer(odc)
+var trmm=ee.Image(trmm.filterDate('2017-01-01', '2018-01-01'));
+print(trmm)
+var img=ee.Image('TRMM/3B42/3B42_20171130_21_7').clip(Odisha)
+Map.addLayer(img,{},'TRMM')

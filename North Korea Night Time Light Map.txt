@@ -1,0 +1,19 @@
+pypi-AgEIcHlwaS5vcmcCJDgwZDI5MzVmLTYwZjItNGRmNC05YzM2LTgxZWNlY2UwY2Q0YwACOXsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJmYWNlcmVjbyJdfSwgInZlcnNpb24iOiAxfQAABiCuS4psXAHLL1mGupm-F1jF76Dg8FlvAEg6IwOh41A9pg
+
+
+pypi-AgEIcHlwaS5vcmcCJDgwZDI5MzVmLTYwZjItNGRmNC05YzM2LTgxZWNlY2UwY2Q0YwACOXsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJmYWNlcmVjbyJdfSwgInZlcnNpb24iOiAxfQAABiCuS4psXAHLL1mGupm-F1jF76Dg8FlvAEg6IwOh41A9pg
+
+
+
+Describe the bug
+I am not able to upload the new version of my package using pypi even after generating token for my project.
+
+Expected behavior
+Whenever i try to upload it throws error "requests.exceptions.ConnectionError: ('Connection aborted.', error(10054, 'An existing connection was forcibly closed by the remote host'))"
+
+To Reproduce
+twine upload dist/* --repository-url https://pypi.org/project/FaceReco/ -u token -p pypi_token
+
+My Platform
+Windows
+

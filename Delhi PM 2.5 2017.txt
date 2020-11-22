@@ -1,0 +1,36 @@
+// Load a Fusion Table corresponding to mean annual PM10 concentrations at points.
+// var airQualityMeasurements1 = ee.FeatureCollection('ft:1ecTRxiMaeh6N7EK3Gb2yB8ypqVv5Qb7Hw_SOxRvm');
+// Map.addLayer(airQualityMeasurements1, {}, 'Mean annual PM10 concentrations (micrograms/m^3)');
+var airQualityMeasurements = ee.FeatureCollection('ft:1gCIAOOY-VvJRNhleepli3IUnp3zwH0Zw551POp5i');
+Map.addLayer(airQualityMeasurements, {}, 'Mean annual PM10 concentrations (micrograms/m^3)');
+
+// This is the name of the property to interpolate.
+var propertyToInterpolate = 'ArithmeticMean';
+
+// Combine mean and SD reducers for efficiency.
+var combinedReducer = ee.Reducer.mean().combine({
+    reducer2: ee.Reducer.stdDev(),
+    sharedInputs: true
+});
+
+// Estimate global mean and standard deviation (SD) from the points.
+var stats = airQualityMeasurements.reduceColumns({
+  reducer: combinedReducer,
+  selectors: [propertyToInterpolate]
+});
+
+// Do the interpolation, valid to 50 kilometers.
+var interpolatedPM10 = airQualityMeasurements.inverseDistance({
+  range: 50 * 50,
+  propertyName: propertyToInterpolate,
+  mean: stats.get('mean'),
+  stdDev: stats.get('stdDev'),
+  // gamma: 0.5
+});
+
+// Visualize the resulting interpolated raster.
+var vis = {min:45 , max: 384, palette: ['green', 'orange', 'red']};
+// var vis = {min: 35, max: 220, palette: ['blue', 'green', 'red']};
+Map.setCenter(77.2188, 28.6324, 7);
+Map.addLayer(interpolatedPM10, vis, 'Interpolated PM10 concentration');
+    

@@ -1,0 +1,34 @@
+##code link https://code.earthengine.google.com/d94950811df627e3d2b9e8d001c6d2f4
+
+var elevation = ee.Image("USGS/GMTED2010"),
+    imageVisParam2 = {"opacity":1,"bands":["be75"],"min":61.972473292242796,"max":519.1035432074625,"palette":["0bff56","fff700","ff1919"]},
+    jrc = ee.Image("JRC/GSW1_0/GlobalSurfaceWater"),
+    imageVisParam = {"opacity":1,"bands":["change_abs"],"min":-39.43418610703204,"max":23.389634632016993,"palette":["ff5252","27ff00","0042ff","ffffff"]},
+    imageVisParam3 = {"opacity":1,"bands":["change_abs"],"min":-39.43418610703204,"max":23.389634632016993,"palette":["ff5252","27ff00","0042ff"]};
+	
+	
+var states= ee.FeatureCollection('ft:1jgxXCfcaX3aozNhOFxhXviHje7MTqwDCM3eZU9Ec');
+var Odisha = states.filterMetadata('StateName', 'equals', 'Odisha');
+Map.addLayer(Odisha,{},'Odisha Boundary')
+////////////Transition///////////////
+// color palette
+// "ffffff"=no change
+// "ff0000"=Permanent
+// "ff6c03"=New permanent
+// "ffeb03"=Lost permanent
+// "aaff03"=Seasonal
+// "55b101"=New seasonal
+// "05ffae"=Lost seasonal
+// "0776ff"=Seasonal to permanent
+// "9305ff"=Permanent to seasonal
+// "ff05c9"=Ephemeral permanent
+// "ff036c"=Ephemeral seasonal
+
+jrc=jrc.clip(Odisha)
+Map.addLayer(jrc,{"opacity":1,"bands":["transition"],"min":3.121370328100605,"max":8.4045500325305,"palette":["ffffff","ff0000","ff6c03","ffeb03","aaff03","55b101","05ffae","0776ff","9305ff","ff05c9","ff036c"]},'Transition of water')
+
+//////////////Absolute Change/////////////
+// ff5252= water in 1984-1999 but not in 2000-2015
+// 27ff00= water in 1984-1999 and in 2000-2015
+// 0042ff= water not in 1984-1999 but in 2000-2015
+Map.addLayer(jrc,{"opacity":1,"bands":["change_abs"],"min":-39.43418610703204,"max":23.389634632016993,"palette":["ff5252","27ff00","0042ff"]},'Chnage in Water')

@@ -1,0 +1,233 @@
+##code link : https://code.earthengine.google.com/ef05a370a22cd57fdcae781e374531af
+
+var geometry2 = /* color: #ff0000 */ee.Feature(
+        ee.Geometry.Point([80.24564, 12.963629]),
+        {
+          "system:index": "0"
+        }),
+    geometry3 = /* color: #ff0606 */ee.Feature(
+        ee.Geometry.Point([80.258804, 13.010172]),
+        {
+          "system:index": "0"
+        }),
+    geometry = /* color: #ff0000 */ee.Feature(
+        ee.Geometry.Point([80.185859, 13.022392]),
+        {
+          "system:index": "0"
+        }),
+    geometry4 = /* color: #ff0000 */ee.Feature(
+        ee.Geometry.Point([80.181099, 13.033121]),
+        {
+          "system:index": "0"
+        }),
+    geometry5 = /* color: #ff0000 */ee.Feature(
+        ee.Geometry.Point([80.256636, 13.027328]),
+        {
+          "system:index": "0"
+        }),
+    geometry6 = /* color: #006b34 */ee.Feature(
+        ee.Geometry.Point([80.277194, 13.081417]),
+        {
+          "system:index": "0"
+        }),
+    geometry7 = /* color: #006b34 */ee.Feature(
+        ee.Geometry.Point([80.243722, 13.078347]),
+        {
+          "system:index": "0"
+        }),
+    geometry8 = /* color: #006b34 */ee.Feature(
+        ee.Geometry.Point([80.286745, 13.106225]),
+        {
+          "system:index": "0"
+        }),
+    geometry9 = /* color: #006b34 */ee.Feature(
+        ee.Geometry.Point([80.264862, 13.055362]),
+        {
+          "system:index": "0"
+        }),
+    geometry10 = /* color: #006b34 */ee.Feature(
+        ee.Geometry.Point([80.258993, 13.073774]),
+        {
+          "system:index": "0"
+        }),
+    imageVisParam = {"opacity":1,"bands":["accessibility"],"min":1.7838230796334607,"max":40.99437801362478,"gamma":1},
+    imageVisParam2 = {"opacity":1,"bands":["friction"],"min":-0.0003135124875255505,"max":0.013577545730651158,"gamma":1},
+    doklam = /* color: #d63000 */ee.Geometry.Point([88.94119262695312, 27.302231692214853]),
+    assam = /* color: #98ff00 */ee.Geometry.Point([94.658203125, 26.588527147308614]),
+    arunachalPradesh = /* color: #0b4a8b */ee.Geometry.Point([95.91064453125, 28.863918426224565]),
+    tibet = /* color: #ffc82d */ee.Geometry.Point([90.966796875, 30.543338954230222]),
+    rannOfKutch = /* color: #00ffff */ee.Geometry.Point([70.9991455078125, 24.165549146828848]),
+    pok = /* color: #bf04c2 */ee.Geometry.Point([73.9599609375, 36.06686213257888]),
+    bangladeshBorders = /* color: #ff0000 */ee.Geometry.Point([89.176025390625, 22.9381596393164]),
+    pakistan = /* color: #00ff00 */ee.Geometry.Point([68.818359375, 29.09457707751183]);
+	
+//red points= private hospitals
+//green points =government hospitals
+
+// Load the global Accessibility to Cities image and the Friction Surface.
+var accessibility = ee.Image('Oxford/MAP/accessibility_to_cities_2015_v1_0');
+var friction = ee.Image('Oxford/MAP/friction_surface_2015_v1_0');
+
+//This accessibility is computed using a cost-distance algorithm which computes 
+// the "cost" of travelling between two locations on a regular raster grid. 
+// Generally this cost is measured in units of time. The cells in this raster 
+// grid contain values which represent the cost required to travel across them
+Map.addLayer(accessibility,imageVisParam,'accefssibility')
+
+// The friction-surface contains information on the transport network and 
+// environmental and political factors that affect travel times between locations. 
+// Transport networks can include road and rail networks, navigable rivers and 
+// shipping lanes
+Map.addLayer(friction,imageVisParam2,'fiction')
+
+
+// Color palettes for visualizing accessibility and friction data.
+var accessibilityPalette = ['f2fef8', 'defce1', 'c9f3bc', 'cbeca7', 'd6e793',
+  'e2d87b', 'd4a561', 'c46c49', 'ab3a38', '922f4b', '7d285d', '672069',
+  '3a1453', '1b0c3c', '050526', '00030f', '000000'];
+var frictionPalette = ['313695', '4575b4', '74add1', 'abd9e9', 'e0f3f8',
+  'ffffbf', 'fee090', 'fdae61', 'f46d43', 'd73027', 'a50026'];
+
+var chennaiBounds = ee.FeatureCollection('ft:1P5GJkJqcKt0BwQOnmvGF4egirZx7kVOAaNTe-OW3')
+// Map.addLayer(chennaiBounds)
+
+// Apply the color palette to the log of travel time.
+var accessibilityVis = {min:0, max:10, palette:accessibilityPalette};
+var logAccessibility = accessibility.where(accessibility.gt(0), accessibility.log());
+var accessibilityRgb = logAccessibility.visualize(accessibilityVis);
+
+// Composite onto a solid-color background to fill in the oceans.
+var background = ee.Image(0).visualize({palette:['11101e']});
+
+var accessibilityBlended = background.blend(accessibilityRgb).updateMask(1);
+// Add the visualization of accessibility to cities to the map.
+Map.addLayer(accessibilityBlended, {}, 'Accessibility to Cities 2015');
+
+// Apply the color palette to the friction surface.
+var frictionVis = {min:0.0022, max:0.04, palette:frictionPalette};
+var frictionRgb = friction.visualize(frictionVis);
+
+// Add the visualization of the friction surface to the map, default off.
+Map.addLayer(frictionRgb, {}, 'Friction Surface');
+
+//////////////list of hospitals in chennai/////////////////////
+// governmnet hospitals
+// var governmentHospitals = ee.FeatureCollection([
+//   geometry6, //  Government General Hospital, Chennai
+//   geometry8, // Stanley Medical College
+//   geometry7, // Kilpauk Medical College
+//   geometry9, // Government Royapettah Hospital
+//   geometry10, // Institute of Obstertrics & Gynaecology and Hospital for Women & Children, Chennai, TamilNadu
+// ]);
+// // private hospitals
+// var privateHospitals=ee.FeatureCollection([
+//   geometry2, // Appolo Hospital, Chennai
+//   geometry3, // Fortis Malar Hospital
+//   geometry, // MIOT Hospital
+//   geometry4, // SRM Hospital
+//   geometry5, // Billroth Hospital
+  
+// ]);
+
+var areas = ee.FeatureCollection([
+  doklam, //  Doklam
+  assam, // Assam
+  arunachalPradesh, // Arunachal Pradesh
+  tibet, // Tibet
+  rannOfKutch, // Rann Of Kutch
+  pok, //Pakistan Occupied Kashmir
+  bangladeshBorders, //Bangladesh West Bengal Borders
+  pakistan, //Pakistan
+]);
+
+
+// // Paint the locations of hospitals into an image.
+// var governmentHospitalsImage = ee.Image(0).float().paint(governmentHospitals, 1);
+// var privateHospitalsImage = ee.Image(0).float().paint(privateHospitals, 1);
+
+var areasImage = ee.Image(0).float().paint(areas, 1);
+
+
+
+// // Compute the cumulative travel time from everywhere to the nearest hospital.
+// var govtravelTime = friction.cumulativeCost(governmentHospitalsImage, 200000);
+// var privatetravelTime = friction.cumulativeCost(privateHospitalsImage, 200000);
+var areatravelTime = friction.cumulativeCost(areasImage, 200000);
+
+// // Apply the color palette to the log of travel time.
+// var govlogTravelTime = govtravelTime.where(govtravelTime.gt(0), govtravelTime.log());
+// var govtravelTimeRgb = govlogTravelTime.visualize(accessibilityVis);
+// var privatelogTravelTime = privatetravelTime.where(privatetravelTime.gt(0), privatetravelTime.log());
+// var privatetravelTimeRgb = privatelogTravelTime.visualize(accessibilityVis);
+var arealogTravelTime = areatravelTime.where(areatravelTime.gt(0), areatravelTime.log());
+var areatravelTimeRgb = arealogTravelTime.visualize(accessibilityVis);
+
+
+
+// // Mask the oceans and composite onto a solid-color background.
+// var govtravelTimeMasked = govtravelTimeRgb.mask(accessibility.mask());
+// var govtravelTimeBlended = background.blend(govtravelTimeMasked).updateMask(1);
+// var pritravelTimeMasked = privatetravelTimeRgb.mask(accessibility.mask());
+// var pritravelTimeBlended = background.blend(pritravelTimeMasked).updateMask(1);
+var areatravelTimeMasked = areatravelTimeRgb.mask(accessibility.mask());
+var areatravelTimeBlended = background.blend(areatravelTimeMasked).updateMask(1);
+
+
+// // Add the visualization of our custom accessibility indicator to the map.
+// Map.addLayer(govtravelTimeBlended, {}, 'Accessibility to Government Chennai Hospitals');
+// Map.addLayer(pritravelTimeBlended, {}, 'Accessibility to Private Chennai Hospitals');
+
+Map.addLayer(areatravelTimeBlended, {}, 'Accessibility To Different Areas');
+
+// Rectangles that define thumbnail image boundaries for Chennai.
+var chennai = ee.Geometry.Rectangle(
+  [79.31, 13.55, 80.706, 12.222], null, false);
+// Map.addLayer(chennai)
+
+
+// Make a thumbnail of accessibility to Chennai.
+print(ui.Thumbnail(accessibilityBlended, {
+  crs: 'SR-ORG:6627',
+  region: chennai.toGeoJSON(),
+  dimensions: '512',
+  format: 'jpg',
+}));
+
+// Make a thumbnail of the friction surface in Chennai.
+print(ui.Thumbnail(frictionRgb, {
+  crs: 'SR-ORG:6627',
+  region: chennai.toGeoJSON(),
+  dimensions: '512',
+  format: 'jpg',
+}));
+
+// Make a thumbnail of accessibility to government hospitals in Chennai.
+print(ui.Thumbnail(govtravelTimeBlended, {
+  crs: 'SR-ORG:6627',
+  region: chennai.toGeoJSON(),
+  dimensions: '512',
+  format: 'jpg',
+}));
+
+// Make a thumbnail of accessibility to priate hospitals in Chennai.
+print(ui.Thumbnail(pritravelTimeBlended, {
+  crs: 'SR-ORG:6627',
+  region: chennai.toGeoJSON(),
+  dimensions: '512',
+  format: 'jpg',
+}));
+// Make a thumbnail of the accessibility color palette.
+print(ui.Thumbnail(ee.Image.pixelLonLat().select('longitude'), {
+  region: [[0, 0], [0, 1], [1, 1], [1,0]],
+  dimensions: '512x32',
+  palette: accessibilityPalette,
+  min:1, max:0
+}));
+
+// Make a thumbnail of the friction surface color palette.
+print(ui.Thumbnail(ee.Image.pixelLonLat().select('longitude'), {
+  region: [[0, 0], [0, 1], [1, 1], [1,0]],
+  dimensions: '512x32',
+  palette: frictionPalette,
+  min:1, max:0
+}));

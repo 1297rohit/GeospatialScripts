@@ -1,0 +1,13 @@
+##code link https://code.earthengine.google.com/6f92cfad75d81cf6bd50b7cb68bbc6cb
+
+var elevation = ee.Image("USGS/GMTED2010"),
+    imageVisParam2 = {"opacity":1,"bands":["be75"],"min":61.972473292242796,"max":519.1035432074625,"palette":["0bff56","fff700","ff1919"]};
+	
+	
+var states= ee.FeatureCollection('ft:1jgxXCfcaX3aozNhOFxhXviHje7MTqwDCM3eZU9Ec');
+var Odisha = states.filterMetadata('StateName', 'equals', 'Odisha');
+Map.addLayer(Odisha,{},'Odisha Boundary')
+// var col=ee.FeatureCollection('ft:1-u_zfFsDdEHYqfKrFMXaU-zGv1jXjUy1bo32FVAW')
+// Map.addLayer(col,{},'GRUMP')
+var elevation=elevation.clip(Odisha)
+Map.addLayer(elevation,imageVisParam2,'elevation') 

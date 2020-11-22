@@ -1,0 +1,57 @@
+# code link https://code.earthengine.google.com/77d41d06343d935426f453cbc0ea27f6
+
+var img2015 = ee.Image("COPERNICUS/S2/20151206T042142_20170519T010750_T46QDJ"),
+    img2017 = ee.Image("COPERNICUS/S2/20171230T042149_20171230T042930_T46QDJ"),
+    geometry = /* color: #d63000 */ee.Geometry.Point([92.1478271484375, 21.192094484509038]),
+    sent = ee.ImageCollection("COPERNICUS/S2"),
+    imageVisParam = {"opacity":1,"bands":["B4","B3","B2"],"max":3000,"gamma":1};
+	
+/////before///
+var imsent2=ee.Image(sent.filterBounds(geometry).filterBounds(geometry).filterDate('2017-01-01','2017-09-30').sort('CLOUDY_PIXEL_PERCENTAGE').first())
+print(imsent2)
+imsent2=imsent2.select('B4', 'B3', 'B2').visualize(imageVisParam).uint8();
+Map.addLayer(imsent2,{},"Sentinel 2 image before")
+///////after////
+var imsent=ee.Image(sent.filterBounds(geometry).filterDate('2017-10-01','2017-12-31').sort('CLOUDY_PIXEL_PERCENTAGE').first())
+print(imsent)
+imsent=imsent.select('B4', 'B3', 'B2').visualize(imageVisParam).uint8();
+Map.addLayer(imsent,{},'Sentinel 2 image')
+
+
+// Export the image, specifying scale and region.
+Export.image.toDrive({
+  image: imsent,
+  description: 'Sentinel2imageafter',
+  scale: 30
+});
+
+Export.image.toDrive({
+  image: imsent2,
+  description: 'Sentinel2imagebefore',
+  scale: 30
+});
+// // set geometry
+// var aoi = ee.Geometry.Polygon([[92.10079193115234,21.231782183740147],
+//                               [92.09976196289062,21.14214965677984],
+//                               [92.19245910644531,21.14118901416337],
+//                               [92.19245910644531,21.237542414259934],
+//                               [92.10044860839844,21.238182425982313],
+//                               [92.10079193115234,21.231782183740147]]);
+                               
+// Map.addLayer(aoi)
+
+// get images
+// var img2015 = ee.Image("COPERNICUS/S2/20151206T042142_20170519T010750_T46QDJ");
+// var img2017 = ee.Image("COPERNICUS/S2/20171230T042149_20171230T042930_T46QDJ");
+// calculate NDVI
+// var ndvi2015 = img2015.normalizedDifference(["B8","B4"]);
+// var ndvi2017 = img2017.normalizedDifference(["B8","B4"]);
+
+// add image to map
+// Map.addLayer(img2015.clip(aoi),{min:0,max:3000,bands:"B4,B3,B2"},"sentinel 2 2015");
+// Map.addLayer(img2017.clip(aoi),{min:0,max:3000,bands:"B4,B3,B2"},"sentinel 2 2017");
+
+// add ndvi to map
+// Map.addLayer(ndvi2015.clip(aoi),{min:0,max:1,palette:"red,yellow,green,darkgreen"},"ndvi 2015");
+// Map.addLayer(ndvi2017.clip(aoi),{min:0,max:1,palette:"red,yellow,green,darkgreen"},"ndvi 2017");
+

@@ -1,0 +1,64 @@
+##code link : https://code.earthengine.google.com/88d40c868e5cab0a7bd6e0b58eb2729d
+var point = /* color: #d63000 */ee.Geometry.Point([93.33984375, 29.240873709577276]),
+    l8 = ee.ImageCollection("LANDSAT/LC8_L1T_TOA"),
+    area = /* color: #3fd60e */ee.Geometry.Polygon(
+        [[[92.60588640810738, 28.208223243210448],
+          [92.91333900173231, 28.266260308126974],
+          [93.56118389649578, 28.70055871373618],
+          [94.28587943734033, 28.969887967567693],
+          [94.25293648610159, 29.15224608816576],
+          [94.81292207987894, 29.28641636858967],
+          [95.24115377126463, 29.113899725149192],
+          [95.24112970574947, 29.792723999564156],
+          [93.60510809407515, 30.002116035922104],
+          [92.32045086886671, 29.945064007516525],
+          [91.9470958920067, 29.065930562678464]]]),
+    sent = ee.ImageCollection("COPERNICUS/S2");
+	
+// setting the map to Calicut 
+Map.setCenter(90.64,29.18, 9);
+
+
+// Buffer region 
+var roi = point.buffer(90000);
+Map.addLayer(roi);
+
+// Bands to select from the image
+var bands = ['B1','B2', 'B3', 'B4', 'B5', 'B7','B10','B11'];
+
+// Visualization parameters
+var viz = {bands: ['B3', 'B2', 'B1'], max: 0.5, gamma: 2};
+
+// Getting best image tile for the area near point
+var image = ee.Image(sent.filterBounds(point).filterDate('2016-01-01','2017-09-01').sort('CLOUDY_PIXEL_PERCENTAGE').first()).select(bands);
+
+// clipping the district boundary from image tile
+image = image.clip(area);
+
+// adding the best clipped image for the district
+Map.addLayer(image,viz,'tibet');
+
+// Passing training data for the classifier
+var polygons = ee.FeatureCollection('ft:1EMZP2--JEUSmrzdLY3QHHiqmuu5ovNnzTUquKTMZ').remap([1, 2], [0, 1], 'class');
+
+// creating training variable to be passed to the classifier
+var training = image.sampleRegions({
+
+  collection: polygons,
+  properties: ['class'],
+  scale: 30
+});
+
+// training for the classifier ( Random Forest classifier used with 10 trees )
+var trained = ee.Classifier.randomForest(20).train(training, 'class', bands);
+
+// classifying the whole image for the district out of the training that classifier got
+var classified = image.classify(trained);
+
+// adding the classified image to the map
+Map.addLayer(classified.updateMask(classified.not()), {min: 0, max: 1, palette: ['FF0000', '00FF00']},
+  'shed detected');
+  
+  
+
+
